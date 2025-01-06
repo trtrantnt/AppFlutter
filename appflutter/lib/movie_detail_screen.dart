@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
+import 'video_player_screen.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final String title;
@@ -20,35 +19,6 @@ class MovieDetailScreen extends StatefulWidget {
 }
 
 class _MovieDetailScreenState extends State<MovieDetailScreen> {
-  late VideoPlayerController _videoPlayerController;
-  ChewieController? _chewieController;
-
-  @override
-  void initState() {
-    super.initState();
-    _videoPlayerController = VideoPlayerController.network(widget.videoUrl)
-      ..initialize().then((_) {
-        setState(() {
-          _chewieController = ChewieController(
-            videoPlayerController: _videoPlayerController,
-            aspectRatio: _videoPlayerController.value.aspectRatio,
-            autoPlay: false,
-            looping: false,
-            // Các tùy chọn khác
-          );
-        });
-      }).catchError((error) {
-        print('Lỗi khi khởi tạo video: $error');
-      });
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController?.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,14 +51,24 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             ),
             SizedBox(height: 20),
             Center(
-              child: _chewieController != null && _chewieController!.videoPlayerController.value.isInitialized
-                  ? AspectRatio(
-                      aspectRatio: _chewieController!.videoPlayerController.value.aspectRatio,
-                      child: Chewie(
-                        controller: _chewieController!,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => VideoPlayerScreen(
+                        title: widget.title,
+                        overview: widget.overview,
+                        videoUrl: widget.videoUrl,
                       ),
-                    )
-                  : CircularProgressIndicator(),
+                    ),
+                  );
+                },
+                icon: Icon(Icons.play_arrow),
+                label: Text('Xem phim'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Màu nền của nút
+                ),
+              ),
             ),
           ],
         ),

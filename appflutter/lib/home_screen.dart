@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'movie_service.dart';
-import 'movie_detail_screen.dart';
+import 'movie_detail_screen.dart'; // Thêm dòng này để nhập khẩu MovieDetailScreen
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: movie.title,
                           posterPath: movie.posterPath,
                           overview: movie.overview,
-                          videoUrl: 'https://firebasestorage.googleapis.com/v0/b/webxemphim-3f6a5.appspot.com/o/SPIDER-MAN-%20NO%20WAY%20HOME%20-%20Official%20Trailer%20(HD).mp4?alt=media&token=692e6fba-2b8d-48dc-88a5-f9d8245cd8b9', // Thay thế bằng URL video hợp lệ
+                          videoUrl: movie.videoUrl ?? '', // Sử dụng URL video từ danh sách
                         ),
                       ),
                     );

@@ -1,8 +1,8 @@
+import 'package:appflutter/movie_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
-import 'movie_detail_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart' show Firebase;
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
