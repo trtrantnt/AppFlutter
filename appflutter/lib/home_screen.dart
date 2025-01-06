@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'movie_service.dart';
 import 'movie_detail_screen.dart'; // Thêm dòng này để nhập khẩu MovieDetailScreen
+import 'TimKiem.dart'; // Import SearchWidget
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -14,11 +15,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Movie>> futureMovies;
+  List<Movie> _allMovies = [];
+  List<Movie> _filteredMovies = [];
 
   @override
   void initState() {
     super.initState();
     futureMovies = MovieService().fetchMovies();
+    futureMovies.then((movies) {
+      setState(() {
+        _allMovies = movies;
+        _filteredMovies = movies;
+      });
+    });
+  }
+
+  void _handleSearch(String query) {
+    setState(() {
+      _filteredMovies = _allMovies.where((movie) {
+        return movie.title.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
@@ -32,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 50,
         ),
         actions: [
+          SearchWidget(onSearch: _handleSearch),
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushReplacementNamed('/login');
+            onPressed: () {
+              // Xử lý logic đăng xuất ở đây
             },
           ),
         ],
@@ -48,13 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Lỗi: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Không có phim nào'));
           } else {
             return ListView.builder(
-              itemCount: snapshot.data!.length,
+              itemCount: _filteredMovies.length,
               itemBuilder: (context, index) {
-                final movie = snapshot.data![index];
+                final movie = _filteredMovies[index];
                 return ListTile(
                   leading: Image.network(movie.posterPath),
                   title: Text(movie.title),
@@ -65,7 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: movie.title,
                           posterPath: movie.posterPath,
                           overview: movie.overview,
-                          videoUrl: movie.videoUrl ?? '', // Sử dụng URL video từ danh sách
+                          videoUrl: movie.videoUrl ??
+                              '', // Sử dụng URL video từ danh sách
                         ),
                       ),
                     );
