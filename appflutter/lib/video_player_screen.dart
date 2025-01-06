@@ -21,7 +21,8 @@ class VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  double _rating = 0.0;
+  double _averageRating = 0.0;
+  int _ratingCount = 0;
 
   @override
   void initState() {
@@ -40,25 +41,29 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         print('Lỗi khi khởi tạo video: $error');
       });
 
-    _fetchRating();
+    _fetchRatings();
   }
 
-  Future<void> _fetchRating() async {
-    DocumentSnapshot doc = await FirebaseFirestore.instance.collection('movies').doc(widget.title).get();
-    if (doc.exists) {
+  Future<void> _fetchRatings() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('movies').doc(widget.title).collection('ratings').get();
+    if (querySnapshot.docs.isNotEmpty) {
+      double totalRating = 0.0;
+      int ratingCount = querySnapshot.docs.length;
+      for (var doc in querySnapshot.docs) {
+        totalRating += doc['rating'];
+      }
       setState(() {
-        _rating = doc['rating'];
+        _averageRating = totalRating / ratingCount;
+        _ratingCount = ratingCount;
       });
     }
   }
 
   Future<void> _updateRating(double rating) async {
-    await FirebaseFirestore.instance.collection('movies').doc(widget.title).set({
+    await FirebaseFirestore.instance.collection('movies').doc(widget.title).collection('ratings').add({
       'rating': rating,
     });
-    setState(() {
-      _rating = rating;
-    });
+    _fetchRatings(); // Cập nhật điểm đánh giá trung bình sau khi thêm đánh giá mới
   }
 
   @override
@@ -114,7 +119,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   Icon(Icons.star, color: Colors.yellow),
                   SizedBox(width: 8),
                   Text(
-                    _rating.toString(),
+                    _averageRating.toStringAsFixed(1),
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '($_ratingCount đánh giá)',
                     style: TextStyle(
                       fontSize: 16,
                     ),
@@ -132,23 +144,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                   ),
                   SizedBox(width: 8),
                   IconButton(
-                    icon: Icon(Icons.star, color: _rating >= 1 ? Colors.yellow : Colors.grey),
+                    icon: Icon(Icons.star, color: _averageRating >= 1 ? Colors.yellow : Colors.grey),
                     onPressed: () => _updateRating(1),
                   ),
                   IconButton(
-                    icon: Icon(Icons.star, color: _rating >= 2 ? Colors.yellow : Colors.grey),
+                    icon: Icon(Icons.star, color: _averageRating >= 2 ? Colors.yellow : Colors.grey),
                     onPressed: () => _updateRating(2),
                   ),
                   IconButton(
-                    icon: Icon(Icons.star, color: _rating >= 3 ? Colors.yellow : Colors.grey),
+                    icon: Icon(Icons.star, color: _averageRating >= 3 ? Colors.yellow : Colors.grey),
                     onPressed: () => _updateRating(3),
                   ),
                   IconButton(
-                    icon: Icon(Icons.star, color: _rating >= 4 ? Colors.yellow : Colors.grey),
+                    icon: Icon(Icons.star, color: _averageRating >= 4 ? Colors.yellow : Colors.grey),
                     onPressed: () => _updateRating(4),
                   ),
                   IconButton(
-                    icon: Icon(Icons.star, color: _rating >= 5 ? Colors.yellow : Colors.grey),
+                    icon: Icon(Icons.star, color: _averageRating >= 5 ? Colors.yellow : Colors.grey),
                     onPressed: () => _updateRating(5),
                   ),
                 ],
