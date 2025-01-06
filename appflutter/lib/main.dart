@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
+import 'movie_detail_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,7 +26,13 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/login': (context) => LoginScreen(),
-        '/home': (context) => HomeScreen( user: FirebaseAuth.instance.currentUser!),
+        '/home': (context) => HomeScreen(user: FirebaseAuth.instance.currentUser!),
+        '/movie_detail': (context) => MovieDetailScreen(
+          title: '',
+          posterPath: '',
+          overview: '',
+          videoUrl: '', // Thêm thuộc tính videoUrl
+        ),
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'movie_service.dart';
+import 'movie_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -24,7 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trang chủ'),
+        centerTitle: true,
+        title: Image.asset(
+          'assets/1.png',
+          height: 50,
+          width: 50,
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
@@ -52,6 +58,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 return ListTile(
                   leading: Image.network(movie.posterPath),
                   title: Text(movie.title),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailScreen(
+                          title: movie.title,
+                          posterPath: movie.posterPath,
+                          overview: movie.overview,
+                          videoUrl: 'https://firebasestorage.googleapis.com/v0/b/webxemphim-3f6a5.appspot.com/o/SPIDER-MAN-%20NO%20WAY%20HOME%20-%20Official%20Trailer%20(HD).mp4?alt=media&token=692e6fba-2b8d-48dc-88a5-f9d8245cd8b9', // Thay thế bằng URL video hợp lệ
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             );
