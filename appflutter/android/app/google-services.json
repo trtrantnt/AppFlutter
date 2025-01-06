@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414718306936",
+    "project_id": "moivexpapp",
+    "storage_bucket": "moivexpapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414718306936:android:74828008a0165c0f2d1b8d",
+        "android_client_info": {
+          "package_name": "com.example.appflutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_LwbL_1ng4e9YoZpXFYbyoWxEF_kkDY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
