@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'movie_service.dart';
-import 'movie_detail_screen.dart'; // Thêm dòng này để nhập khẩu MovieDetailScreen
-import 'TimKiem.dart'; // Import SearchWidget
+import 'movie_detail_screen.dart';
+import 'favorite_movies_screen.dart';
+import 'TimKiem.dart'; // Thêm dòng này để nhập khẩu SearchWidget
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -15,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Movie>> futureMovies;
-  List<Movie> _allMovies = [];
   List<Movie> _filteredMovies = [];
 
   @override
@@ -24,17 +24,16 @@ class _HomeScreenState extends State<HomeScreen> {
     futureMovies = MovieService().fetchMovies();
     futureMovies.then((movies) {
       setState(() {
-        _allMovies = movies;
         _filteredMovies = movies;
       });
     });
   }
 
-  void _handleSearch(String query) {
-    setState(() {
-      _filteredMovies = _allMovies.where((movie) {
-        return movie.title.toLowerCase().contains(query.toLowerCase());
-      }).toList();
+  void _onSearch(String query) {
+    futureMovies.then((movies) {
+      setState(() {
+        _filteredMovies = movies.where((movie) => movie.title.toLowerCase().contains(query.toLowerCase())).toList();
+      });
     });
   }
 
@@ -49,11 +48,18 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 50,
         ),
         actions: [
-          SearchWidget(onSearch: _handleSearch),
+          SearchWidget(onSearch: _onSearch), // Thêm thanh tìm kiếm vào AppBar
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/favorites');
+            },
+          ),
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: () {
-              // Xử lý logic đăng xuất ở đây
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushReplacementNamed('/login');
             },
           ),
         ],
@@ -65,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Lỗi: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('Không có phim nào'));
           } else {
             return ListView.builder(
               itemCount: _filteredMovies.length,
@@ -80,8 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: movie.title,
                           posterPath: movie.posterPath,
                           overview: movie.overview,
-                          videoUrl: movie.videoUrl ??
-                              '', // Sử dụng URL video từ danh sách
+                          videoUrl: movie.videoUrl ?? '', // Sử dụng URL video từ danh sách
                         ),
                       ),
                     );

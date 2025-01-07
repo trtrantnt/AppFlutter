@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 import 'movie_detail_screen.dart';
+import 'favorite_movies_screen.dart'; // Thêm dòng này để nhập khẩu FavoriteMoviesScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
           overview: '',
           videoUrl: '', // Thêm thuộc tính videoUrl
         ),
+        '/favorites': (context) => FavoriteMoviesScreen(), // Thêm route cho FavoriteMoviesScreen
       },
     );
   }
